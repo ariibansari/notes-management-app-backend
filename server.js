@@ -1,23 +1,24 @@
 const express = require('express');
-const cors = require('cors');
-const PORT = process.env.PORT || 5000;
-const hostname = '0.0.0.0';
-
 const app = express();
-app.use(cors())
+const path = require('path')
+const PORT = process.env.PORT || 5000;
 
-app.get('/', (req, res) => {
-    res.send('<h1>Node Server is Live<h1>');
+app.use('/', express.static(path.join(__dirname, 'public')))
+
+app.use('/', require('./routes/root'));
+
+app.all('*', (req, res)=>{
+    res.status(404);
+    if(req.accepts('html')){
+        res.sendFile(path.join(__dirname, 'views', '404.html'))
+
+    }else if(req.accepts('json')){
+        res.json({message: '404 Not Found'})
+    }else{
+        res.type('txt').send('404 Not Found')
+    }
 })
 
-app.get('/name', (req, res) => {
-    res.send('<h1>Arib</h1>');
-})
-
-app.get('/profession', (req, res) => {
-    res.json({profession:'Full Stack Web Developer');
-})
-
-app.listen(PORT, hostname, ()=> {
+app.listen(PORT, ()=> {
     console.log(`Server started on port ${PORT}`)
 })
